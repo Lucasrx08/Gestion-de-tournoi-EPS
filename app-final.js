@@ -1,0 +1,8 @@
+function exportCsv(){var rows=[['Rang','Équipe','J','V','N','D','Pour','Contre','Diff','Pts']].concat(standings().map(function(r,i){return[i+1,r.name,r.p,r.w,r.n,r.l,r.for,r.against,r.diff,r.pts]}));download('classement.csv',rows.map(function(r){return r.join(';')}).join(String.fromCharCode(10)),'text/csv')}
+function exportExcel(){var h='<html><meta charset="UTF-8"><table border="1"><tr><th>Rang</th><th>Équipe</th><th>Pts</th></tr>'+standings().map(function(r,i){return'<tr><td>'+(i+1)+'</td><td style="background:'+r.color+';color:white">'+esc(r.name)+'</td><td>'+r.pts+'</td></tr>'}).join('')+'</table></html>';download('classement.xls',h,'application/vnd.ms-excel')}
+function exportJson(){download('tournoi.json',JSON.stringify(state,null,2),'application/json')}
+function download(n,c,t){var b=new Blob([c],{type:t}),u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download=n;a.click();setTimeout(function(){URL.revokeObjectURL(u)},1000)}
+function fmt(x){x=Math.max(0,Math.round(x||0));return String(Math.floor(x/60)).padStart(2,'0')+':'+String(x%60).padStart(2,'0')}
+function strategyName(x){return x==='synchronized'?'Tous ensemble':x==='first'?'Premier fini = arrêt général':'Terrain par terrain'}
+function beep(force){if(!force&&state.config&&!state.config.sound)return;try{if(!audio)audio=new(window.AudioContext||window.webkitAudioContext)();var o=audio.createOscillator(),g=audio.createGain();o.frequency.value=440;g.gain.value=.15;o.connect(g).connect(audio.destination);o.start();o.stop(audio.currentTime+.18)}catch(e){}}
+init();

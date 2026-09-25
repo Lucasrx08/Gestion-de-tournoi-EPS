@@ -4,189 +4,131 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#0f172a">
-  <meta name="description" content="Gestionnaire visuel de tournois EPS multisport pour enseignants et élèves.">
+  <meta name="description" content="Gestionnaire visuel de tournois EPS multisport.">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="icon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="styles.css">
-  <title>Tournoi EPS</title>
+  <title>Gestion de tournoi EPS</title>
 </head>
 <body>
-  <header class="app-header">
-    <div>
-      <p class="eyebrow">GESTIONNAIRE VISUEL</p>
-      <h1>Tournoi EPS</h1>
-    </div>
-    <div class="header-actions">
-      <button class="role-btn active" data-role="teacher">Prof</button>
-      <button class="role-btn" data-role="student">Élève</button>
-      <button class="role-btn" data-role="tv">TV</button>
-    </div>
-  </header>
-
-  <main>
+  <main class="app-shell">
     <section id="homeView" class="view active">
-      <div class="hero">
-        <div>
-          <p class="eyebrow">SIMPLE • VISUEL • TACTILE</p>
-          <h2>Organiser un tournoi sans tableau Excel.</h2>
-          <p>Crée les équipes, choisis les terrains, lance les matchs ensemble ou terrain par terrain et laisse l'application calculer rotations et classement.</p>
+      <div class="home-card">
+        <div class="brand-mark">EPS</div>
+        <p class="eyebrow">GESTION DE TOURNOI</p>
+        <h1>Créer un tournoi simplement.</h1>
+        <p class="home-copy">Une étape à la fois. L’application construit ensuite les matchs, les terrains, les rotations et le classement.</p>
+        <div class="home-actions">
+          <button id="startWizardBtn" class="btn primary xl">Commencer un tournoi</button>
+          <button id="resumeBtn" class="btn secondary xl">Reprendre le tournoi en cours</button>
         </div>
-        <div class="hero-actions">
-          <button id="newTournamentBtn" class="btn primary big">＋ Nouveau tournoi</button>
-          <button id="resumeTournamentBtn" class="btn secondary big">▶ Reprendre</button>
-        </div>
-      </div>
-      <div class="quick-grid">
-        <button class="quick-card" data-preset="badminton"><span>🏸</span><strong>Badminton</strong><small>Simple / double</small></button>
-        <button class="quick-card" data-preset="basket3"><span>🏀</span><strong>Basket 3x3</strong><small>Demi-terrains</small></button>
-        <button class="quick-card" data-preset="handball"><span>🤾</span><strong>Handball</strong><small>Matchs au temps</small></button>
-        <button class="quick-card" data-preset="tabletennis"><span>🏓</span><strong>Tennis de table</strong><small>Multi-tables</small></button>
       </div>
     </section>
 
-    <section id="setupView" class="view">
-      <div class="section-head">
-        <div><p class="eyebrow">CRÉATION RAPIDE</p><h2>Configurer le tournoi</h2></div>
-        <button class="btn ghost" data-go-home>← Accueil</button>
-      </div>
-      <form id="setupForm" class="setup-layout">
-        <div class="panel">
-          <h3>1. Activité</h3>
-          <label>Nom du tournoi<input id="tournamentName" type="text" value="Tournoi EPS" maxlength="70"></label>
-          <label>Sport<select id="sportSelect"></select></label>
-          <label>Format<select id="formatSelect"></select></label>
+    <section id="wizardView" class="view">
+      <header class="wizard-header">
+        <button id="wizardHomeBtn" class="icon-btn" type="button" aria-label="Retour à l'accueil">←</button>
+        <div class="wizard-progress-wrap">
+          <div class="wizard-progress-text"><span id="stepLabel">Étape 1 sur 9</span><span id="stepTitleMini">Sport</span></div>
+          <div class="progress-track"><div id="progressBar" class="progress-bar"></div></div>
         </div>
+      </header>
 
-        <div class="panel">
-          <h3>2. Participants et terrains</h3>
-          <div class="two-cols">
-            <label>Nombre d'équipes / joueurs<input id="teamCount" type="number" min="2" max="64" value="8"></label>
-            <label>Nombre de terrains<input id="courtCount" type="number" min="1" max="24" value="4"></label>
-          </div>
-          <button id="buildTeamsBtn" type="button" class="btn secondary">Préparer les équipes</button>
-          <div id="teamsEditor" class="teams-editor"></div>
-          <details class="import-box">
-            <summary>Importer / coller une liste</summary>
-            <p class="hint">Collez des lignes « Nom;Prénom;Classe;Équipe » ou importez un CSV/TSV. Si la colonne Équipe est vide, une équipe est créée par ligne.</p>
-            <textarea id="pasteImport" rows="5" placeholder="Nom;Prénom;Classe;Équipe&#10;Dupont;Léa;5A;Bleus"></textarea>
-            <div class="row-actions">
-              <input id="csvFile" type="file" accept=".csv,.tsv,.txt,text/csv,text/tab-separated-values">
-              <button id="applyPasteBtn" type="button" class="btn secondary">Appliquer la liste</button>
-            </div>
-          </details>
-        </div>
+      <div id="wizardContent" class="wizard-content"></div>
 
-        <div class="panel">
-          <h3>3. Formule</h3>
-          <label>Organisation<select id="formulaSelect">
-            <option value="roundrobin">Championnat — tous contre tous</option>
-            <option value="knockout">Élimination directe</option>
-            <option value="pools">2 poules + phase finale</option>
-            <option value="ladder">Montante-descendante</option>
-            <option value="swiss">Ronde suisse</option>
-          </select></label>
-          <div id="formulaHelp" class="callout"></div>
-        </div>
-
-        <div class="panel">
-          <h3>4. Fin des matchs</h3>
-          <div class="segmented" id="endModeGroup">
-            <label><input type="radio" name="endMode" value="time" checked><span>Au temps</span></label>
-            <label><input type="radio" name="endMode" value="score"><span>Au score</span></label>
-            <label><input type="radio" name="endMode" value="hybrid"><span>Score ou temps</span></label>
-            <label><input type="radio" name="endMode" value="free"><span>Libre</span></label>
-          </div>
-          <div class="two-cols">
-            <label id="durationWrap">Durée (minutes)<input id="durationMin" type="number" min="1" max="60" value="5"></label>
-            <label id="targetWrap">Score à atteindre<input id="targetScore" type="number" min="1" max="100" value="11"></label>
-          </div>
-          <label>Fonctionnement<select id="finishStrategy">
-            <option value="independent">Chaque terrain indépendant</option>
-            <option value="synchronized">Rotation commune</option>
-            <option value="firstEndsAll">Premier match terminé = fin générale</option>
-          </select></label>
-          <div class="switch-row"><label><input id="studentStart" type="checkbox" checked> Les élèves peuvent démarrer leur terrain</label></div>
-          <div class="switch-row"><label><input id="studentScore" type="checkbox" checked> Les élèves peuvent saisir le score</label></div>
-          <div class="switch-row"><label><input id="soundEnabled" type="checkbox" checked> Signal sonore de fin</label><button id="testSoundBtn" type="button" class="btn ghost">🔊 Tester</button></div>
-        </div>
-
-        <div class="panel summary-panel">
-          <h3>5. Résumé</h3>
-          <div id="setupSummary"></div>
-          <button type="submit" class="btn primary big full">Générer le tournoi</button>
-        </div>
-      </form>
+      <footer class="wizard-footer">
+        <button id="prevStepBtn" class="btn ghost big" type="button">← Précédent</button>
+        <button id="nextStepBtn" class="btn primary big" type="button">Continuer →</button>
+      </footer>
     </section>
 
     <section id="tournamentView" class="view">
-      <div class="tournament-top">
+      <header class="tournament-header">
         <div>
+          <button id="tournamentHomeBtn" class="text-back" type="button">← Accueil</button>
           <p id="tournamentMeta" class="eyebrow"></p>
           <h2 id="tournamentTitle">Tournoi</h2>
         </div>
-        <div class="top-actions teacher-only">
-          <button id="soundTestLive" class="btn ghost">🔊 Son</button>
-          <button id="editTournamentBtn" class="btn ghost">⚙ Réglages</button>
-          <button id="homeBtn" class="btn ghost">⌂ Accueil</button>
+        <div class="tournament-actions">
+          <button id="studentModeBtn" class="btn ghost">Mode élève</button>
+          <button id="tvModeBtn" class="btn ghost">Affichage TV</button>
         </div>
-      </div>
+      </header>
 
-      <nav class="tabs">
-        <button class="tab active" data-tab="courts">Terrains</button>
-        <button class="tab" data-tab="standings">Classement</button>
-        <button class="tab" data-tab="where">Où je joue ?</button>
-        <button class="tab teacher-only" data-tab="schedule">Planning</button>
-        <button class="tab teacher-only" data-tab="exports">Exports</button>
+      <nav class="tournament-nav" aria-label="Navigation du tournoi">
+        <button class="nav-pill active" data-tab="courts">Terrains</button>
+        <button class="nav-pill" data-tab="standings">Classement</button>
+        <button class="nav-pill" data-tab="where">Où je joue ?</button>
+        <button class="nav-pill teacher-control" data-tab="schedule">Planning</button>
+        <button class="nav-pill teacher-control" data-tab="exports">Exports</button>
       </nav>
 
-      <div id="courtsTab" class="tab-panel active">
-        <section class="rotation-bar">
+      <section id="courtsTab" class="tab-panel active">
+        <div class="rotation-toolbar">
           <div>
-            <p class="eyebrow">ROTATION</p>
-            <div class="rotation-line"><strong id="rotationLabel">1 / 1</strong><span id="rotationProgress">0 / 0 matchs terminés</span></div>
+            <p class="eyebrow">ROTATION EN COURS</p>
+            <div class="rotation-title"><strong id="rotationLabel">1 / 1</strong><span id="rotationProgress">0 / 0 terminé</span></div>
           </div>
           <div id="globalClock" class="global-clock">—</div>
-          <div class="global-controls teacher-only">
+          <div class="teacher-control toolbar-actions">
             <button id="startAllBtn" class="btn primary">▶ Lancer les matchs prêts</button>
             <button id="pauseAllBtn" class="btn secondary">⏸ Pause générale</button>
             <button id="stopAllBtn" class="btn danger">■ Terminer tous</button>
-            <button id="add30Btn" class="btn ghost">+30 s</button>
           </div>
-        </section>
-        <div id="courtsGrid" class="courts-grid"></div>
-        <div class="rotation-footer">
-          <div id="restingTeams" class="resting"></div>
-          <button id="nextRotationBtn" class="btn primary big teacher-only">Rotation suivante →</button>
         </div>
-      </div>
 
-      <div id="standingsTab" class="tab-panel">
-        <div class="section-head compact"><div><p class="eyebrow">CLASSEMENT EN DIRECT</p><h3>Résultats</h3></div></div>
-        <div class="table-wrap"><table><thead><tr><th>#</th><th>Équipe / joueur</th><th>J</th><th>V</th><th>N</th><th>D</th><th>+</th><th>-</th><th>Diff.</th><th>Pts</th></tr></thead><tbody id="standingsBody"></tbody></table></div>
-      </div>
+        <div id="courtsGrid" class="courts-grid"></div>
 
-      <div id="whereTab" class="tab-panel">
+        <div class="rotation-bottom">
+          <div id="restingTeams" class="resting"></div>
+          <button id="nextRotationBtn" class="btn primary big teacher-control">Rotation suivante →</button>
+        </div>
+      </section>
+
+      <section id="standingsTab" class="tab-panel">
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>#</th><th>Équipe / joueur</th><th>J</th><th>V</th><th>N</th><th>D</th><th>+</th><th>-</th><th>Diff.</th><th>Pts</th></tr></thead>
+            <tbody id="standingsBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section id="whereTab" class="tab-panel">
         <div class="where-card">
-          <p class="eyebrow">ÉLÈVES</p><h3>Où je joue ?</h3>
-          <label>Mon équipe / mon nom<select id="whereSelect"></select></label>
+          <p class="eyebrow">ÉLÈVES</p>
+          <h3>Où je joue ?</h3>
+          <label>Choisis ton équipe / ton nom
+            <select id="whereSelect"></select>
+          </label>
           <div id="whereResult" class="where-result"></div>
         </div>
-      </div>
+      </section>
 
-      <div id="scheduleTab" class="tab-panel teacher-only">
+      <section id="scheduleTab" class="tab-panel teacher-control">
         <div id="scheduleList" class="schedule-list"></div>
-      </div>
+      </section>
 
-      <div id="exportsTab" class="tab-panel teacher-only">
-        <div class="exports-grid">
-          <button id="exportCsvBtn" class="export-card"><strong>CSV</strong><span>Résultats et classement</span></button>
-          <button id="exportExcelBtn" class="export-card"><strong>Excel</strong><span>Fichier .xls avec couleurs</span></button>
-          <button id="printBtn" class="export-card"><strong>PDF / Impression</strong><span>Planning et résultats</span></button>
-          <button id="exportJsonBtn" class="export-card"><strong>Sauvegarde</strong><span>Exporter les données JSON</span></button>
+      <section id="exportsTab" class="tab-panel teacher-control">
+        <div class="export-grid">
+          <button id="exportCsvBtn" class="option-card"><strong>CSV</strong><span>Classement et résultats</span></button>
+          <button id="exportExcelBtn" class="option-card"><strong>Excel</strong><span>Avec couleurs d’équipes</span></button>
+          <button id="printBtn" class="option-card"><strong>PDF / Imprimer</strong><span>Planning et résultats</span></button>
+          <button id="exportJsonBtn" class="option-card"><strong>Sauvegarde</strong><span>Données du tournoi</span></button>
         </div>
-      </div>
+      </section>
     </section>
   </main>
+
+  <div id="tvOverlay" class="tv-overlay" aria-hidden="true">
+    <button id="exitTvBtn" class="tv-exit" type="button">← Quitter l’affichage TV</button>
+    <div class="tv-header">
+      <p id="tvMeta" class="eyebrow"></p>
+      <h2 id="tvTitle">Tournoi</h2>
+      <div id="tvClock" class="tv-clock">—</div>
+    </div>
+    <div id="tvCourts" class="tv-courts"></div>
+  </div>
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <script src="app.js"></script>
